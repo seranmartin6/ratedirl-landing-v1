@@ -133,6 +133,7 @@ export default function Home() {
               src={phoneMockup} 
               alt="RatedIRL App Preview" 
               className="relative mx-auto w-[380px] h-auto drop-shadow-2xl"
+              style={{ mixBlendMode: 'lighten' }}
             />
           </motion.div>
         </section>
