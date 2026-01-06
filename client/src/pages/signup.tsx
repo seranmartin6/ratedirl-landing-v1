@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Link } from "wouter";
-import { ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { ShieldCheck, Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 export default function Signup() {
   const [, navigate] = useLocation();
@@ -40,6 +40,14 @@ export default function Signup() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-6 transition-colors"
+          data-testid="link-back"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to home
+        </Link>
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <ShieldCheck className="w-9 h-9 text-blue-400 fill-blue-400/20" />
