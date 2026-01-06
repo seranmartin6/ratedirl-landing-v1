@@ -2,15 +2,14 @@ import { ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { ProfileAvatar } from "./profile-avatar";
-import { motion } from "framer-motion";
+import { ShimmerLogo } from "./shimmer-logo";
 import { 
   Home, 
   Search, 
   PlusCircle, 
   Settings, 
   BarChart3, 
-  Shield, 
-  ShieldCheck,
+  Shield,
   LogOut,
   Menu,
   X,
@@ -44,25 +43,8 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* Top Nav */}
       <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/app" className="flex items-center gap-2">
-            <motion.div
-              animate={{
-                filter: [
-                  "brightness(1) drop-shadow(0 0 0px rgba(96, 165, 250, 0))",
-                  "brightness(1.3) drop-shadow(0 0 8px rgba(96, 165, 250, 0.8))",
-                  "brightness(1) drop-shadow(0 0 0px rgba(96, 165, 250, 0))"
-                ]
-              }}
-              transition={{
-                duration: 0.8,
-                repeat: Infinity,
-                repeatDelay: 10,
-                ease: "easeInOut"
-              }}
-            >
-              <ShieldCheck className="w-6 h-6 text-blue-400 fill-blue-400/20" style={{ transform: 'scaleY(0.95)' }} />
-            </motion.div>
-            <span className="font-display font-bold text-xl hidden sm:block" style={{ transform: 'scaleY(0.97)' }}>RatedIRL</span>
+          <Link href="/app">
+            <ShimmerLogo size="md" showText={true} />
           </Link>
 
           {/* Desktop Nav */}

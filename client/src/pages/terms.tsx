@@ -1,5 +1,6 @@
 import { Link } from "wouter";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { ShimmerLogo } from "@/components/shimmer-logo";
 
 export const TOS_VERSION = "1.0.0";
 export const TOS_LAST_UPDATED = "January 6, 2026";
@@ -16,9 +17,8 @@ export default function Terms() {
           Back to home
         </Link>
 
-        <div className="flex items-center gap-3 mb-8">
-          <ShieldCheck className="w-8 h-8 text-blue-400 fill-blue-400/20" style={{ transform: 'scaleY(0.95)' }} />
-          <span className="font-display font-bold text-2xl" style={{ transform: 'scaleY(0.97)' }}>RatedIRL</span>
+        <div className="mb-8">
+          <ShimmerLogo size="lg" showText={true} />
         </div>
 
         <div className="glass rounded-2xl p-8 md:p-12">

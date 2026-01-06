@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Link } from "wouter";
-import { ShieldCheck, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { ShimmerLogo } from "@/components/shimmer-logo";
 
 export default function Login() {
   const [, navigate] = useLocation();
@@ -44,9 +45,8 @@ export default function Login() {
           Back to home
         </Link>
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <ShieldCheck className="w-8 h-8 text-blue-400 fill-blue-400/20" style={{ transform: 'scaleY(0.95)' }} />
-            <span className="font-display font-bold text-2xl" style={{ transform: 'scaleY(0.97)' }}>RatedIRL</span>
+          <Link href="/" className="inline-block mb-6">
+            <ShimmerLogo size="lg" showText={true} />
           </Link>
           <h1 className="text-3xl font-bold font-display mb-2">Welcome back</h1>
           <p className="text-white/60">Sign in to your account</p>
