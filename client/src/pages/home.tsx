@@ -297,7 +297,7 @@ export default function Home() {
       <footer className="border-t border-white/5 bg-black/20 backdrop-blur-sm py-12">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-xs font-bold">R</div>
+            <ShieldCheck className="w-6 h-6 text-blue-400 fill-blue-400/20" />
             <span className="font-display font-bold text-lg">RatedIRL</span>
           </div>
           <div className="text-sm text-white/40">

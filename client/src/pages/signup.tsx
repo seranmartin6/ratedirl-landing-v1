@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Link } from "wouter";
+import { ShieldCheck } from "lucide-react";
 
 export default function Signup() {
   const [, navigate] = useLocation();
@@ -40,9 +41,7 @@ export default function Signup() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl shadow-lg">
-              R
-            </div>
+            <ShieldCheck className="w-9 h-9 text-blue-400 fill-blue-400/20" />
             <span className="font-display font-bold text-2xl">RatedIRL</span>
           </Link>
           <h1 className="text-3xl font-bold font-display mb-2">Create account</h1>

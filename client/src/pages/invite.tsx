@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
-import { UserPlus, CheckCircle, AlertCircle } from "lucide-react";
+import { UserPlus, CheckCircle, AlertCircle, ShieldCheck } from "lucide-react";
 
 export default function InvitePage() {
   const { token } = useParams<{ token: string }>();
@@ -88,9 +88,7 @@ export default function InvitePage() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl shadow-lg">
-              R
-            </div>
+            <ShieldCheck className="w-9 h-9 text-blue-400 fill-blue-400/20" />
             <span className="font-display font-bold text-2xl">RatedIRL</span>
           </Link>
         </div>

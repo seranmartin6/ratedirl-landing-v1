@@ -9,6 +9,7 @@ import {
   Settings, 
   BarChart3, 
   Shield, 
+  ShieldCheck,
   LogOut,
   Menu,
   X
@@ -42,9 +43,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/app" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg shadow-lg">
-              R
-            </div>
+            <ShieldCheck className="w-7 h-7 text-blue-400 fill-blue-400/20" />
             <span className="font-display font-bold text-xl hidden sm:block">RatedIRL</span>
           </Link>
 
