@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   LogOut,
   Menu,
-  X
+  X,
+  Rss
 } from "lucide-react";
 import { useState } from "react";
 
@@ -27,6 +28,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const navItems = [
     { href: "/app", icon: Home, label: "Dashboard" },
+    { href: "/feed", icon: Rss, label: "Feed" },
     { href: "/people", icon: Search, label: "Search" },
     { href: "/nominate", icon: PlusCircle, label: "Nominate" },
     { href: "/analytics", icon: BarChart3, label: "Analytics" },
