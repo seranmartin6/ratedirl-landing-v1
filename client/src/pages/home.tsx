@@ -34,9 +34,7 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/50 backdrop-blur-md">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-lg shadow-primary/20">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
+            <ShieldCheck className="w-7 h-7 text-primary" />
             <span className="font-display font-bold text-xl tracking-tight">RatedIRL</span>
           </div>
 
