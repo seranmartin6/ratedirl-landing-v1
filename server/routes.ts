@@ -12,7 +12,8 @@ import {
 } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { randomUUID } from "crypto";
-import MemoryStore from "memorystore";
+import connectPgSimple from "connect-pg-simple";
+import pg from "pg";
 import { ObjectStorageService } from "./replit_integrations/object_storage";
 
 declare module "express-session" {
@@ -21,7 +22,11 @@ declare module "express-session" {
   }
 }
 
-const MemoryStoreSession = MemoryStore(session);
+const PgSession = connectPgSimple(session);
+
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.session.userId) {
@@ -50,13 +55,16 @@ export async function registerRoutes(
     secret: process.env.SESSION_SECRET || randomUUID(),
     resave: false,
     saveUninitialized: false,
-    store: new MemoryStoreSession({
-      checkPeriod: 86400000,
+    store: new PgSession({
+      pool: pgPool,
+      tableName: 'user_sessions',
+      createTableIfMissing: true,
     }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: 'lax',
     },
   }));
 
