@@ -34,6 +34,13 @@ Preferred communication style: Simple, everyday language.
   - `nominations` - Invite tokens for adding new people
   - `reports` - Content flagging for moderation
   - `profileViews` - Analytics tracking
+  - `follows` - User follows for profiles (social feed feature)
+
+### Social Feed Feature
+- **Activity Feed**: Shows recent reviews, newly claimed profiles, and trending profiles
+- **Filters**: All, Reviews, New Profiles, Trending, Following
+- **Trending Algorithm**: Calculated from last 7 days data using formula: `views + (reviews × 10)`
+- **Follow System**: Users can follow profiles to see their activity in the Following filter
 
 ### Authentication & Authorization
 - Session-based authentication stored server-side
