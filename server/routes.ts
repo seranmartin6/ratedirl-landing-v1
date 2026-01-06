@@ -67,6 +67,11 @@ export async function registerRoutes(
         return res.status(400).json({ message: fromZodError(result.error).message });
       }
 
+      // Explicit server-side ToS validation
+      if (!result.data.tosVersion || result.data.tosVersion.trim() === "") {
+        return res.status(400).json({ message: "You must accept the Terms of Service to create an account." });
+      }
+
       const existing = await storage.getUserByEmail(result.data.email);
       if (existing) {
         return res.status(400).json({ message: "Email already registered" });
