@@ -14,7 +14,7 @@ import {
   X 
 } from "lucide-react";
 import heroBg from "@assets/generated_images/abstract_dark_gradient_background_with_subtle_neon_glows.png";
-import phoneMockup from "@assets/generated_images/realistic_smartphone_3d_render.png";
+import phoneMockup from "@assets/generated_images/phone_on_black_background.png";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
