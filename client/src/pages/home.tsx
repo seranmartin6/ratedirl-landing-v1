@@ -84,9 +84,9 @@ export default function Home() {
             </div>
             
             <h1 className="font-display text-5xl lg:text-7xl font-bold leading-[1.1] mb-6 tracking-tight">
-              Ratings in <br />
+              Ratings <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-gradient">
-                real life.
+                irl.
               </span>
             </h1>
             
