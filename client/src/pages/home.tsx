@@ -41,12 +41,12 @@ export default function Home() {
           </div>
 
           <div className="hidden md:flex items-center gap-6">
-            <button className="text-sm font-medium text-white/70 hover:text-white transition-colors">
-              Claim Profile
-            </button>
-            <button className="bg-white text-black px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 active:scale-95">
-              Join Waitlist
-            </button>
+            <Link href="/login" className="text-sm font-medium text-white/70 hover:text-white transition-colors" data-testid="link-login">
+              Sign In
+            </Link>
+            <Link href="/signup" className="bg-white text-black px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 active:scale-95" data-testid="link-signup">
+              Get Started
+            </Link>
           </div>
 
           <button 
@@ -60,8 +60,8 @@ export default function Home() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden absolute top-20 left-0 w-full bg-background border-b border-white/10 p-6 flex flex-col gap-4 animate-in slide-in-from-top-5">
-            <button className="w-full text-left py-2 text-white/70">Claim Profile</button>
-            <button className="w-full bg-white text-black py-3 rounded-xl font-semibold">Join Waitlist</button>
+            <Link href="/login" className="w-full text-left py-2 text-white/70" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
+            <Link href="/signup" className="w-full bg-white text-black py-3 rounded-xl font-semibold text-center" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
           </div>
         )}
       </nav>
@@ -95,13 +95,13 @@ export default function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <button className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-semibold transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/25">
-                Join the waitlist
-              </button>
-              <button className="glass hover:bg-white/10 px-8 py-4 rounded-full font-semibold transition-all flex items-center justify-center gap-2">
-                View demo
+              <Link href="/signup" className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-semibold transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/25 text-center" data-testid="button-signup-hero">
+                Get started free
+              </Link>
+              <Link href="/login" className="glass hover:bg-white/10 px-8 py-4 rounded-full font-semibold transition-all flex items-center justify-center gap-2" data-testid="button-login-hero">
+                Sign in
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
             </div>
 
             <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-sm text-white/40">
