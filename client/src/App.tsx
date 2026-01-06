@@ -18,6 +18,7 @@ import Analytics from "@/pages/analytics";
 import AdminModeration from "@/pages/admin";
 import InvitePage from "@/pages/invite";
 import Feed from "@/pages/feed";
+import Terms from "@/pages/terms";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, isLoading } = useAuth();
@@ -45,6 +46,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
       <Route path="/invite/:token" component={InvitePage} />
+      <Route path="/terms" component={Terms} />
       
       {/* Protected routes */}
       <Route path="/app">

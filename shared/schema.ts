@@ -25,6 +25,8 @@ export const users = pgTable("users", {
   kycStatus: kycStatusEnum("kyc_status").default("none"),
   kycVerifiedAt: timestamp("kyc_verified_at"),
   role: roleEnum("role").default("user"),
+  tosAcceptedAt: timestamp("tos_accepted_at"),
+  tosVersion: text("tos_version"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -92,9 +94,11 @@ export const follows = pgTable("follows", {
 export const insertUserSchema = createInsertSchema(users).omit({ 
   id: true, 
   createdAt: true,
-  passwordHash: true 
+  passwordHash: true,
+  tosAcceptedAt: true,
 }).extend({
   password: z.string().min(6),
+  tosVersion: z.string().min(1, "You must accept the Terms of Service"),
 });
 
 export const loginSchema = z.object({

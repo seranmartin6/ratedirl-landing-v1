@@ -30,6 +30,7 @@ interface SignupData {
   firstName: string;
   lastName: string;
   username: string;
+  tosVersion: string;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);

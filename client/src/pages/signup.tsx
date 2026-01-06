@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Link } from "wouter";
-import { ShieldCheck, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { ShieldCheck, Eye, EyeOff, ArrowLeft, CheckSquare, Square } from "lucide-react";
+import { TOS_VERSION } from "./terms";
 
 export default function Signup() {
   const [, navigate] = useLocation();
@@ -15,6 +16,7 @@ export default function Signup() {
     username: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [tosAccepted, setTosAccepted] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -26,9 +28,15 @@ export default function Signup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    
+    if (!tosAccepted) {
+      setError("You must accept the Terms of Service to create an account.");
+      return;
+    }
+    
     setLoading(true);
     try {
-      await signup(formData);
+      await signup({ ...formData, tosVersion: TOS_VERSION });
       navigate("/app");
     } catch (err: any) {
       setError(err.message);
@@ -141,10 +149,44 @@ export default function Signup() {
             </div>
           </div>
 
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => setTosAccepted(!tosAccepted)}
+              className={`w-full flex items-start gap-3 p-4 rounded-xl border transition-all text-left ${
+                tosAccepted 
+                  ? "bg-primary/10 border-primary/30" 
+                  : "bg-white/5 border-white/10 hover:border-white/20"
+              }`}
+              data-testid="button-tos-accept"
+            >
+              {tosAccepted ? (
+                <CheckSquare className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+              ) : (
+                <Square className="w-5 h-5 text-white/40 shrink-0 mt-0.5" />
+              )}
+              <span className="text-sm text-white/80">
+                I confirm that I am at least 18 years old and I agree to the{" "}
+                <Link 
+                  href="/terms" 
+                  className="text-primary hover:underline font-medium"
+                  onClick={(e) => e.stopPropagation()}
+                  target="_blank"
+                >
+                  Terms of Service
+                </Link>
+                , including the limitation of liability, indemnification, and arbitration clauses.
+              </span>
+            </button>
+            <p className="text-xs text-white/40 text-center">
+              By creating an account, you acknowledge that you have read and understood our Terms of Service (Version {TOS_VERSION}).
+            </p>
+          </div>
+
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-semibold transition-all disabled:opacity-50"
+            disabled={loading || !tosAccepted}
+            className="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             data-testid="button-signup"
           >
             {loading ? "Creating account..." : "Create account"}

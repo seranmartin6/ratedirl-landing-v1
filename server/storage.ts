@@ -118,6 +118,8 @@ export class DatabaseStorage implements IStorage {
       bio: insertUser.bio,
       location: insertUser.location,
       phoneNumber: insertUser.phoneNumber,
+      tosVersion: insertUser.tosVersion,
+      tosAcceptedAt: new Date(),
     }).returning();
     return user;
   }
