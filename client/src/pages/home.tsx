@@ -14,7 +14,6 @@ import {
   X 
 } from "lucide-react";
 import heroBg from "@assets/generated_images/abstract_dark_gradient_background_with_subtle_neon_glows.png";
-import phoneMockup from "@assets/generated_images/phone_on_black_background.png";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -127,14 +126,80 @@ export default function Home() {
             className="relative hidden lg:block"
           >
             {/* Glow behind phone */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[600px] bg-primary/30 rounded-full blur-[120px]"></div>
-            
-            <img 
-              src={phoneMockup} 
-              alt="RatedIRL App Preview" 
-              className="relative mx-auto w-[380px] h-auto drop-shadow-2xl"
-              style={{ mixBlendMode: 'lighten' }}
-            />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[500px] bg-primary/20 rounded-full blur-[100px]"></div>
+
+            <div className="relative mx-auto w-[320px] h-[650px] bg-black rounded-[3rem] border-[8px] border-gray-900 shadow-2xl overflow-hidden ring-1 ring-white/10">
+              {/* Notch */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-900 rounded-b-xl z-20"></div>
+
+              {/* Status Bar */}
+              <div className="px-6 pt-3 flex justify-between text-[10px] font-medium text-white/70">
+                <span>9:41</span>
+                <div className="flex gap-1">
+                  <span>5G</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              {/* App Content */}
+              <div className="h-full overflow-y-auto pt-8 pb-20 px-4 bg-zinc-950 text-white no-scrollbar">
+                
+                {/* Profile Header */}
+                <div className="flex flex-col items-center mb-6">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 border-2 border-white/10 mb-3 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2864&auto=format&fit=crop" alt="Profile" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex items-center gap-1 mb-1">
+                    <h2 className="font-bold text-lg">Alex M.</h2>
+                    <ShieldCheck className="w-4 h-4 text-blue-400 fill-blue-400/20" />
+                  </div>
+                  <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                    <span className="flex text-yellow-500">
+                      <Star className="w-3 h-3 fill-current" />
+                      <Star className="w-3 h-3 fill-current" />
+                      <Star className="w-3 h-3 fill-current" />
+                      <Star className="w-3 h-3 fill-current" />
+                      <Star className="w-3 h-3 fill-current opacity-30" />
+                    </span>
+                    <span className="text-xs font-medium">4.3 (27)</span>
+                  </div>
+                </div>
+
+                {/* Reviews */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">Recent Reviews</h3>
+                  
+                  {[
+                    { stars: 5, text: "Always delivers on time, super reliable friend.", author: "Sarah J.", role: "Verified Friend" },
+                    { stars: 4, text: "Great detailed feedback on my project.", author: "Mike T.", role: "Coworker" },
+                    { stars: 5, text: "Helped me move apartments without complaining!", author: "Davide", role: "Neighbor" }
+                  ].map((review, i) => (
+                    <div key={i} className="bg-white/5 p-3 rounded-xl border border-white/5">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex gap-0.5">
+                          {[...Array(5)].map((_, si) => (
+                            <Star key={si} className={`w-2.5 h-2.5 ${si < review.stars ? "fill-yellow-500 text-yellow-500" : "text-white/20"}`} />
+                          ))}
+                        </div>
+                        <span className="text-[10px] text-white/40">2d ago</span>
+                      </div>
+                      <p className="text-sm text-white/90 mb-2 leading-snug">"{review.text}"</p>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-4 h-4 rounded-full bg-white/20"></div>
+                        <span className="text-[10px] text-white/50">{review.author} • <span className="text-blue-400">{review.role}</span></span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bottom Nav */}
+              <div className="absolute bottom-0 left-0 w-full h-16 bg-zinc-900/90 backdrop-blur-md border-t border-white/5 flex justify-around items-center px-2">
+                 <div className="p-2 text-white/40"><Search className="w-5 h-5" /></div>
+                 <div className="p-2 text-white"><UserCheck className="w-5 h-5" /></div>
+                 <div className="p-2 text-white/40"><MessageSquare className="w-5 h-5" /></div>
+              </div>
+            </div>
           </motion.div>
         </section>
 
