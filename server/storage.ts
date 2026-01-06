@@ -416,7 +416,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Get top profiles
-    const sortedProfileIds = [...scores.entries()]
+    const sortedProfileIds = Array.from(scores.entries())
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
       .map(([id]) => id);
@@ -499,7 +499,6 @@ export class DatabaseStorage implements IStorage {
     if (filter === "all" || filter === "trending") {
       const trending = await this.getTrendingProfiles();
       for (const { profile, score } of trending) {
-        if (filter === "following" && !followedIds.includes(profile.id)) continue;
         feedItems.push({
           id: `trending-${profile.id}`,
           type: "trending",

@@ -352,5 +352,36 @@ export async function registerRoutes(
     res.json({ success: true });
   });
 
+  // Feed routes
+  app.get("/api/feed", requireAuth, async (req, res) => {
+    const filter = (req.query.filter as string) || "all";
+    const validFilters = ["all", "reviews", "new_profiles", "trending", "following"];
+    if (!validFilters.includes(filter)) {
+      return res.status(400).json({ message: "Invalid filter" });
+    }
+    const feed = await storage.getFeed(req.session.userId!, filter as any);
+    res.json(feed);
+  });
+
+  // Follow routes
+  app.post("/api/follow/:profileId", requireAuth, async (req, res) => {
+    const profile = await storage.getProfile(req.params.profileId);
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+    const follow = await storage.followProfile(req.session.userId!, req.params.profileId);
+    res.json(follow);
+  });
+
+  app.delete("/api/follow/:profileId", requireAuth, async (req, res) => {
+    await storage.unfollowProfile(req.session.userId!, req.params.profileId);
+    res.json({ success: true });
+  });
+
+  app.get("/api/follow/:profileId", requireAuth, async (req, res) => {
+    const isFollowing = await storage.isFollowing(req.session.userId!, req.params.profileId);
+    res.json({ isFollowing });
+  });
+
   return httpServer;
 }
