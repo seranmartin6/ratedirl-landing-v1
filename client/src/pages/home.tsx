@@ -34,7 +34,7 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/50 backdrop-blur-md">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-7 h-7 text-primary" />
+            <ShieldCheck className="w-7 h-7 text-blue-400 fill-blue-400/20" />
             <span className="font-display font-bold text-xl tracking-tight">RatedIRL</span>
           </div>
 
