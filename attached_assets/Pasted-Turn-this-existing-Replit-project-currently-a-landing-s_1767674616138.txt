@@ -1,0 +1,182 @@
+Turn this existing Replit project (currently a landing site) into a fully functional web app MVP: “Google Reviews for People” (RatedIRL). Keep the current branding/style as much as possible, but add real working functionality.
+
+1) Overall goal
+
+Convert landing page into a working app with:
+
+Authentication
+
+Profiles
+
+Search
+
+Reviews (stars + short text)
+
+Consent-based/opt-in review system (important)
+
+Nomination/invite flow
+
+Basic admin moderation
+
+Simple analytics dashboard
+
+2) Tech requirements (Replit-friendly)
+
+Use a simple, deployable full-stack setup inside Replit:
+
+Frontend: React + Vite (or Next.js if already Next)
+
+Backend API: Express (Node)
+
+Database: SQLite with Prisma (easy in Replit), OR Supabase if already connected
+
+Provide clear ENV setup instructions in README (example keys, where to paste them in Replit Secrets)
+
+The result must run with one command and be deployable from Replit.
+
+3) Pages / routes to implement
+
+Public:
+
+/ Landing (existing)
+
+/login
+
+/signup
+
+Authenticated:
+
+/app (feed or dashboard)
+
+/people (search + results)
+
+/people/:id (profile page with ratings summary + reviews list)
+
+/write-review/:id (leave a review)
+
+/nominate (nominate someone)
+
+/settings (privacy controls)
+
+/analytics (basic user analytics)
+Admin-only:
+
+/admin/moderation (reports queue + remove/hide reviews + ban users)
+
+4) Authentication + verification
+
+Auth must support:
+
+Email + password (baseline)
+
+Phone verification placeholder (MVP): store phone number + “verified” flag; include UI + flow even if SMS provider isn’t wired yet
+
+Add “Verified” badge to profile:
+
+Phone verified badge
+
+Optional KYC “upper-tier verified” badge (MVP placeholder state + UI)
+
+5) Core database models (implement these)
+
+Users
+
+id, email, passwordHash, firstName, lastName, username, photoUrl, bio, location
+
+phoneNumber, phoneVerified (bool)
+
+kycStatus (none/pending/verified)
+
+role (user/admin)
+
+createdAt
+
+PeopleProfiles (for subjects being reviewed)
+
+id, ownerUserId (nullable until claimed), firstName, lastName, location
+
+contactEmail/phone (optional, for invite)
+
+claimed (bool)
+
+privacy: profileVisibility (public/private), reviewsVisibility (public/private)
+
+createdAt
+
+Reviews
+
+id, reviewerUserId, targetProfileId
+
+rating (1–5), text (max ~150 chars)
+
+status (published/hidden/pending)
+
+createdAt
+
+Nominations / Invites
+
+id, nominatorUserId
+
+targetFirstName, targetLastName, contactEmailOrPhone
+
+inviteToken, accepted (bool), acceptedByUserId (nullable)
+
+createdAt
+
+Reports
+
+id, reporterUserId, reviewId, reason, status (open/closed)
+
+createdAt
+
+ProfileViews (for analytics)
+
+id, viewerUserId (nullable), targetProfileId, createdAt
+
+6) Consent-based rules (must enforce)
+
+Reviews can ONLY be published if:
+
+The target profile is “claimed” by a logged-in user, OR
+
+The nominated person accepts the invite and claims the profile
+
+If not claimed yet: store reviews as pending (not publicly visible) until claim/acceptance.
+
+7) UX requirements
+
+Search bar to find people by name + location
+
+Profile page shows:
+
+Avg rating, count, rating breakdown, recent reviews
+
+“Claim this profile” flow if the logged-in user matches the identity (MVP: claim via invite token)
+
+Privacy controls:
+
+Toggle profile visibility and review visibility
+
+Moderation:
+
+Report review button
+
+Admin page to hide/delete reviews and close reports
+
+8) Deliverables
+
+Implement the full working MVP in this Replit project
+
+Add a README that explains:
+
+How to run locally in Replit
+
+What secrets are needed
+
+How to create an admin user
+
+How the consent-based review rule works
+
+Make sure there are no broken routes and the app is usable end-to-end.
+
+Start by inspecting the current codebase, identify the framework, and then implement the above step-by-step while preserving the existing landing page design.
