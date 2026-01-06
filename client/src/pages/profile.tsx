@@ -9,7 +9,9 @@ import {
   Flag, 
   Pencil, 
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  UserPlus,
+  UserMinus
 } from "lucide-react";
 import { useState } from "react";
 
@@ -55,6 +57,40 @@ export default function ProfilePage() {
       setReportReason("");
     },
   });
+
+  const { data: followData } = useQuery({
+    queryKey: ["follow", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/follow/${id}`);
+      if (!res.ok) return { isFollowing: false };
+      return res.json();
+    },
+    enabled: !!id,
+  });
+
+  const followMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/follow/${id}`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed to follow");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["follow", id] });
+    },
+  });
+
+  const unfollowMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/follow/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to unfollow");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["follow", id] });
+    },
+  });
+
+  const isFollowing = followData?.isFollowing;
 
   if (isLoading) {
     return (
@@ -162,6 +198,29 @@ export default function ProfilePage() {
                   <Star className="w-4 h-4" />
                   Write a review
                 </Link>
+              )}
+              {!isOwner && (
+                isFollowing ? (
+                  <button
+                    onClick={() => unfollowMutation.mutate()}
+                    disabled={unfollowMutation.isPending}
+                    className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+                    data-testid="button-unfollow"
+                  >
+                    <UserMinus className="w-4 h-4" />
+                    Unfollow
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => followMutation.mutate()}
+                    disabled={followMutation.isPending}
+                    className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+                    data-testid="button-follow"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Follow
+                  </button>
+                )
               )}
             </div>
           </div>
