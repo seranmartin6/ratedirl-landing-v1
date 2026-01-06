@@ -3,7 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { AppLayout } from "@/components/app-layout";
 import { ProfileAvatar } from "@/components/profile-avatar";
 import { Link } from "wouter";
+import { motion } from "framer-motion";
 import { Search as SearchIcon, MapPin, Star, ShieldCheck, Users } from "lucide-react";
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05, duration: 0.3, ease: "easeOut" as const }
+  })
+};
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -80,14 +90,26 @@ export default function SearchPage() {
         )}
 
         {profiles && profiles.length > 0 && (
-          <div className="grid gap-4">
-            {profiles.map((profile: any) => (
-              <Link
+          <motion.div 
+            className="grid gap-4"
+            initial="hidden"
+            animate="visible"
+          >
+            {profiles.map((profile: any, index: number) => (
+              <motion.div
                 key={profile.id}
-                href={`/people/${profile.id}`}
-                className="glass rounded-2xl p-6 hover:bg-white/10 transition-colors block"
-                data-testid={`card-profile-${profile.id}`}
+                custom={index}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover={{ scale: 1.01, y: -2 }}
+                transition={{ type: "spring", stiffness: 300 }}
               >
+                <Link
+                  href={`/people/${profile.id}`}
+                  className="glass rounded-2xl p-6 hover:bg-white/10 transition-colors block"
+                  data-testid={`card-profile-${profile.id}`}
+                >
                 <div className="flex items-center gap-4">
                   <ProfileAvatar 
                     photoUrl={profile.ownerPhotoUrl} 
@@ -119,8 +141,9 @@ export default function SearchPage() {
                   </div>
                 </div>
               </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
 
         {searchTerm && profiles && profiles.length === 0 && !isLoading && (

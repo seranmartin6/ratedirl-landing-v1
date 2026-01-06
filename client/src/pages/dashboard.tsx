@@ -3,7 +3,21 @@ import { useAuth } from "@/lib/auth";
 import { AppLayout } from "@/components/app-layout";
 import { ProfileAvatar } from "@/components/profile-avatar";
 import { Link } from "wouter";
+import { motion } from "framer-motion";
 import { Star, Eye, MessageSquare, ArrowRight, ShieldCheck, Search, PlusCircle } from "lucide-react";
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -37,9 +51,17 @@ export default function Dashboard() {
 
   return (
     <AppLayout>
-      <div className="space-y-8">
+      <motion.div 
+        className="space-y-8"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+      >
         {/* Welcome Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <motion.div 
+          className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          variants={fadeInUp}
+        >
           <div>
             <h1 className="text-3xl font-bold font-display mb-2">
               Welcome back, {user?.firstName}!
@@ -47,26 +69,38 @@ export default function Dashboard() {
             <p className="text-white/60">Here's what's happening with your reputation.</p>
           </div>
           <div className="flex gap-3">
-            <Link
-              href="/people"
-              className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
-            >
-              <Search className="w-4 h-4" />
-              Find people
-            </Link>
-            <Link
-              href="/nominate"
-              className="flex items-center gap-2 bg-primary hover:bg-primary/90 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
-            >
-              <PlusCircle className="w-4 h-4" />
-              Nominate
-            </Link>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href="/people"
+                className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+              >
+                <Search className="w-4 h-4" />
+                Find people
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href="/nominate"
+                className="flex items-center gap-2 bg-primary hover:bg-primary/90 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+              >
+                <PlusCircle className="w-4 h-4" />
+                Nominate
+              </Link>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="glass rounded-2xl p-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+          variants={staggerContainer}
+        >
+          <motion.div 
+            className="glass rounded-2xl p-6"
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
                 <Eye className="w-5 h-5 text-primary" />
@@ -74,9 +108,14 @@ export default function Dashboard() {
               <span className="text-white/60 text-sm">Profile Views</span>
             </div>
             <p className="text-3xl font-bold">{analytics?.profileViews || 0}</p>
-          </div>
+          </motion.div>
 
-          <div className="glass rounded-2xl p-6">
+          <motion.div 
+            className="glass rounded-2xl p-6"
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
                 <Star className="w-5 h-5 text-accent" />
@@ -84,9 +123,14 @@ export default function Dashboard() {
               <span className="text-white/60 text-sm">Reviews Received</span>
             </div>
             <p className="text-3xl font-bold">{analytics?.reviewsReceived || 0}</p>
-          </div>
+          </motion.div>
 
-          <div className="glass rounded-2xl p-6">
+          <motion.div 
+            className="glass rounded-2xl p-6"
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
                 <MessageSquare className="w-5 h-5 text-green-400" />
@@ -94,8 +138,8 @@ export default function Dashboard() {
               <span className="text-white/60 text-sm">Reviews Given</span>
             </div>
             <p className="text-3xl font-bold">{analytics?.reviewsGiven || 0}</p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Your Profile Card */}
         {myProfile && (
@@ -234,7 +278,7 @@ export default function Dashboard() {
             </Link>
           </div>
         )}
-      </div>
+      </motion.div>
     </AppLayout>
   );
 }

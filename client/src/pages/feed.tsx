@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { AppLayout } from "@/components/app-layout";
+import { motion } from "framer-motion";
 import { 
   Star, 
   TrendingUp, 
@@ -11,6 +12,15 @@ import {
   Flame
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05, duration: 0.3, ease: "easeOut" as const }
+  })
+};
 
 type FilterType = "all" | "reviews" | "new_profiles" | "trending" | "following";
 
@@ -128,13 +138,26 @@ export default function Feed() {
   return (
     <AppLayout>
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold font-display mb-6">Activity Feed</h1>
+        <motion.div 
+          className="flex items-center gap-3 mb-6"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h1 className="text-2xl font-bold font-display">Activity Feed</h1>
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+          </span>
+          <span className="text-xs text-green-400/80 font-medium">Live</span>
+        </motion.div>
 
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {filters.map((filter) => (
-            <button
+            <motion.button
               key={filter.key}
               onClick={() => setActiveFilter(filter.key)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 activeFilter === filter.key
                   ? "bg-primary text-white"
@@ -143,7 +166,7 @@ export default function Feed() {
               data-testid={`filter-${filter.key}`}
             >
               {filter.label}
-            </button>
+            </motion.button>
           ))}
         </div>
 
@@ -161,11 +184,21 @@ export default function Feed() {
             )}
           </div>
         ) : (
-          <div className="space-y-4">
-            {feedItems.map((item) => (
-              <div
+          <motion.div 
+            className="space-y-4"
+            initial="hidden"
+            animate="visible"
+          >
+            {feedItems.map((item, index) => (
+              <motion.div
                 key={item.id}
-                className="glass rounded-2xl p-5 hover:bg-white/5 transition-colors"
+                custom={index}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover={{ scale: 1.01, y: -2 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="glass rounded-2xl p-5 hover:bg-white/5 transition-colors cursor-pointer"
                 data-testid={`feed-item-${item.id}`}
               >
                 <div className="flex items-start gap-4">
@@ -264,9 +297,9 @@ export default function Feed() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </AppLayout>
