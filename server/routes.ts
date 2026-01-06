@@ -410,9 +410,20 @@ export async function registerRoutes(
       }
 
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
-
-      res.json({ uploadURL, objectPath, metadata: { name, size, contentType } });
+      
+      // Extract the object path from the signed URL
+      // The URL format is: https://storage.googleapis.com/bucket-name/.private/uploads/uuid?...
+      const url = new URL(uploadURL);
+      const pathParts = url.pathname.split("/");
+      // Find the uploads/uuid part
+      const uploadsIndex = pathParts.findIndex(p => p === "uploads");
+      if (uploadsIndex !== -1 && pathParts[uploadsIndex + 1]) {
+        const objectId = pathParts[uploadsIndex + 1];
+        const objectPath = `/objects/uploads/${objectId}`;
+        res.json({ uploadURL, objectPath, metadata: { name, size, contentType } });
+      } else {
+        throw new Error("Failed to parse upload URL");
+      }
     } catch (error: any) {
       console.error("Error generating upload URL:", error);
       res.status(500).json({ error: "Failed to generate upload URL" });
@@ -422,19 +433,26 @@ export async function registerRoutes(
   app.post("/api/users/me/profile-picture", requireAuth, async (req, res) => {
     try {
       const { objectPath } = req.body;
-      if (!objectPath) {
-        return res.status(400).json({ error: "Missing object path" });
+      if (!objectPath || !objectPath.startsWith("/objects/")) {
+        return res.status(400).json({ error: "Invalid object path" });
       }
 
-      // Set ACL policy for the uploaded image (make it public)
-      const normalizedPath = await objectStorageService.trySetObjectEntityAclPolicy(
-        objectPath,
-        { owner: req.session.userId!, visibility: "public" }
-      );
+      // Try to set ACL policy for the uploaded image (make it public)
+      try {
+        const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
+        const { setObjectAclPolicy } = await import("./replit_integrations/object_storage/objectAcl");
+        await setObjectAclPolicy(objectFile, { 
+          owner: req.session.userId!, 
+          visibility: "public" 
+        });
+      } catch (aclError: any) {
+        console.warn("Could not set ACL policy:", aclError.message);
+        // Continue anyway - the file was uploaded
+      }
 
       // Update user's photo URL
       const user = await storage.updateUser(req.session.userId!, {
-        photoUrl: normalizedPath,
+        photoUrl: objectPath,
       });
 
       res.json({ user: { ...user, passwordHash: undefined } });
