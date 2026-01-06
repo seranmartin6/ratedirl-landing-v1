@@ -335,8 +335,8 @@ export default function Home() {
       <footer className="border-t border-white/5 bg-black/20 backdrop-blur-sm py-12">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-blue-400 fill-blue-400/20" />
-            <span className="font-display font-bold text-lg">RatedIRL</span>
+            <ShieldCheck className="w-5 h-5 text-blue-400 fill-blue-400/20" style={{ transform: 'scaleY(0.95)' }} />
+            <span className="font-display font-bold text-lg" style={{ transform: 'scaleY(0.97)' }}>RatedIRL</span>
           </div>
           <div className="text-sm text-white/40">
             © 2024 RatedIRL Inc. All rights reserved.

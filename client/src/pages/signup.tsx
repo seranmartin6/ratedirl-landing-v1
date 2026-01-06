@@ -50,8 +50,8 @@ export default function Signup() {
         </Link>
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <ShieldCheck className="w-9 h-9 text-blue-400 fill-blue-400/20" />
-            <span className="font-display font-bold text-2xl">RatedIRL</span>
+            <ShieldCheck className="w-8 h-8 text-blue-400 fill-blue-400/20" style={{ transform: 'scaleY(0.95)' }} />
+            <span className="font-display font-bold text-2xl" style={{ transform: 'scaleY(0.97)' }}>RatedIRL</span>
           </Link>
           <h1 className="text-3xl font-bold font-display mb-2">Create account</h1>
           <p className="text-white/60">Join the reputation revolution</p>
