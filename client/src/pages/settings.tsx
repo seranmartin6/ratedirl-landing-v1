@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { AppLayout } from "@/components/app-layout";
-import { ShieldCheck, Phone, Eye, EyeOff, Save, CheckCircle } from "lucide-react";
+import { ShieldCheck, Phone, Eye, EyeOff, Save, CheckCircle, Camera, User } from "lucide-react";
 
 export default function Settings() {
   const { user } = useAuth();
@@ -77,6 +77,78 @@ export default function Settings() {
     },
   });
 
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size must be under 5MB");
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      // Step 1: Get presigned URL
+      const urlRes = await fetch("/api/uploads/profile-picture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: file.name,
+          size: file.size,
+          contentType: file.type,
+        }),
+      });
+
+      if (!urlRes.ok) {
+        const error = await urlRes.json();
+        throw new Error(error.error || "Failed to get upload URL");
+      }
+
+      const { uploadURL, objectPath } = await urlRes.json();
+
+      // Step 2: Upload to presigned URL
+      const uploadRes = await fetch(uploadURL, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Failed to upload file");
+      }
+
+      // Step 3: Update user profile with new photo
+      const updateRes = await fetch("/api/users/me/profile-picture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ objectPath }),
+      });
+
+      if (!updateRes.ok) {
+        throw new Error("Failed to update profile picture");
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err: any) {
+      alert(err.message || "Failed to upload photo");
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
     updateUserMutation.mutate(userForm);
@@ -111,6 +183,52 @@ export default function Settings() {
             Changes saved successfully!
           </div>
         )}
+
+        {/* Profile Picture */}
+        <div className="glass rounded-2xl p-6 space-y-4">
+          <h2 className="text-xl font-bold font-display">Profile Picture</h2>
+          <div className="flex items-center gap-6">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-white/20">
+                {user?.photoUrl ? (
+                  <img 
+                    src={user.photoUrl} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                    data-testid="img-profile-picture"
+                  />
+                ) : (
+                  <User className="w-10 h-10 text-white/40" />
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingPhoto}
+                className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary rounded-full flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-50"
+                data-testid="button-upload-photo"
+              >
+                {uploadingPhoto ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4" />
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+                data-testid="input-photo-file"
+              />
+            </div>
+            <div className="text-sm text-white/60">
+              <p>Click the camera icon to upload a new profile picture.</p>
+              <p className="mt-1">Max size: 5MB. Supported: JPG, PNG, GIF.</p>
+            </div>
+          </div>
+        </div>
 
         {/* Profile Settings */}
         <form onSubmit={handleSaveProfile} className="glass rounded-2xl p-6 space-y-6">

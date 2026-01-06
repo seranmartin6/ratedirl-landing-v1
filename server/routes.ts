@@ -13,6 +13,7 @@ import {
 import { fromZodError } from "zod-validation-error";
 import { randomUUID } from "crypto";
 import MemoryStore from "memorystore";
+import { ObjectStorageService } from "./replit_integrations/object_storage";
 
 declare module "express-session" {
   interface SessionData {
@@ -386,6 +387,75 @@ export async function registerRoutes(
   app.get("/api/follow/:profileId", requireAuth, async (req, res) => {
     const isFollowing = await storage.isFollowing(req.session.userId!, req.params.profileId);
     res.json({ isFollowing });
+  });
+
+  // Profile picture upload routes
+  const objectStorageService = new ObjectStorageService();
+
+  app.post("/api/uploads/profile-picture", requireAuth, async (req, res) => {
+    try {
+      const { name, size, contentType } = req.body;
+      if (!name || !contentType) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      // Validate file type
+      if (!contentType.startsWith("image/")) {
+        return res.status(400).json({ error: "Only image files are allowed" });
+      }
+      
+      // Validate file size (5MB max)
+      if (size > 5 * 1024 * 1024) {
+        return res.status(400).json({ error: "File size must be under 5MB" });
+      }
+
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+
+      res.json({ uploadURL, objectPath, metadata: { name, size, contentType } });
+    } catch (error: any) {
+      console.error("Error generating upload URL:", error);
+      res.status(500).json({ error: "Failed to generate upload URL" });
+    }
+  });
+
+  app.post("/api/users/me/profile-picture", requireAuth, async (req, res) => {
+    try {
+      const { objectPath } = req.body;
+      if (!objectPath) {
+        return res.status(400).json({ error: "Missing object path" });
+      }
+
+      // Set ACL policy for the uploaded image (make it public)
+      const normalizedPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        objectPath,
+        { owner: req.session.userId!, visibility: "public" }
+      );
+
+      // Update user's photo URL
+      const user = await storage.updateUser(req.session.userId!, {
+        photoUrl: normalizedPath,
+      });
+
+      res.json({ user: { ...user, passwordHash: undefined } });
+    } catch (error: any) {
+      console.error("Error updating profile picture:", error);
+      res.status(500).json({ error: "Failed to update profile picture" });
+    }
+  });
+
+  // Serve uploaded objects
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      await objectStorageService.downloadObject(objectFile, res);
+    } catch (error: any) {
+      console.error("Error serving object:", error);
+      if (error.name === "ObjectNotFoundError") {
+        return res.status(404).json({ error: "Object not found" });
+      }
+      return res.status(500).json({ error: "Failed to serve object" });
+    }
   });
 
   return httpServer;
