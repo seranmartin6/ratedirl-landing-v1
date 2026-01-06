@@ -344,7 +344,7 @@ export default function Home() {
           <div className="flex gap-6 text-sm text-white/60">
             <a href="#" className="hover:text-white transition-colors">Privacy</a>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-            <a href="#" className="hover:text-white transition-colors">Twitter</a>
+            <a href="https://twitter.com/RatedIRL_" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Twitter</a>
           </div>
         </div>
       </footer>
