@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ShimmerLogo } from "@/components/shimmer-logo";
 import { 
   Star, 
   ShieldCheck, 
@@ -34,7 +33,10 @@ export default function Home() {
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/50 backdrop-blur-md">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <ShimmerLogo size="md" showText={true} />
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-6 h-6 text-blue-400 fill-blue-400/20" style={{ transform: 'scaleY(0.95)' }} />
+            <span className="font-display font-bold text-xl tracking-normal" style={{ transform: 'scaleY(0.97)' }}>RatedIRL</span>
+          </div>
 
           <div className="hidden md:flex items-center gap-6">
             <Link href="/login" className="text-sm font-medium text-white/70 hover:text-white transition-colors" data-testid="link-login">
@@ -332,7 +334,10 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-white/5 bg-black/20 backdrop-blur-sm py-12">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <ShimmerLogo size="sm" showText={true} />
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-blue-400 fill-blue-400/20" style={{ transform: 'scaleY(0.95)' }} />
+            <span className="font-display font-bold text-lg" style={{ transform: 'scaleY(0.97)' }}>RatedIRL</span>
+          </div>
           <div className="text-sm text-white/40">
             © 2024 RatedIRL Inc. All rights reserved.
           </div>

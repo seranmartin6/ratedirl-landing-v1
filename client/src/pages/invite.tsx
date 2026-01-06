@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
-import { UserPlus, CheckCircle, AlertCircle } from "lucide-react";
-import { ShimmerLogo } from "@/components/shimmer-logo";
+import { UserPlus, CheckCircle, AlertCircle, ShieldCheck } from "lucide-react";
 
 export default function InvitePage() {
   const { token } = useParams<{ token: string }>();
@@ -88,8 +87,9 @@ export default function InvitePage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block mb-6">
-            <ShimmerLogo size="lg" showText={true} />
+          <Link href="/" className="inline-flex items-center gap-2 mb-6">
+            <ShieldCheck className="w-8 h-8 text-blue-400 fill-blue-400/20" style={{ transform: 'scaleY(0.95)' }} />
+            <span className="font-display font-bold text-2xl" style={{ transform: 'scaleY(0.97)' }}>RatedIRL</span>
           </Link>
         </div>
 
