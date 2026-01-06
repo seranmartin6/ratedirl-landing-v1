@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { AppLayout } from "@/components/app-layout";
+import { ProfileAvatar } from "@/components/profile-avatar";
 import { Link, useLocation } from "wouter";
 import { 
   Shield, 
@@ -197,9 +198,12 @@ export default function AdminModeration() {
                     <tr key={u.id} className="text-sm">
                       <td className="py-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-white text-xs font-medium">
-                            {u.firstName?.[0]}{u.lastName?.[0]}
-                          </div>
+                          <ProfileAvatar 
+                            photoUrl={u.photoUrl} 
+                            firstName={u.firstName} 
+                            lastName={u.lastName} 
+                            size="sm" 
+                          />
                           <span>{u.firstName} {u.lastName}</span>
                         </div>
                       </td>

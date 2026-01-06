@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AppLayout } from "@/components/app-layout";
+import { ProfileAvatar } from "@/components/profile-avatar";
 import { Link } from "wouter";
 import { Search as SearchIcon, MapPin, Star, ShieldCheck, Users } from "lucide-react";
 
@@ -88,9 +89,13 @@ export default function SearchPage() {
                 data-testid={`card-profile-${profile.id}`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-white text-xl font-bold shrink-0">
-                    {profile.firstName?.[0]}{profile.lastName?.[0]}
-                  </div>
+                  <ProfileAvatar 
+                    photoUrl={profile.ownerPhotoUrl} 
+                    firstName={profile.firstName} 
+                    lastName={profile.lastName} 
+                    size="lg" 
+                    className="rounded-xl"
+                  />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="text-lg font-bold truncate">

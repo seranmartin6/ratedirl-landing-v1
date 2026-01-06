@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { AppLayout } from "@/components/app-layout";
+import { ProfileAvatar } from "@/components/profile-avatar";
 import { Link } from "wouter";
 import { Star, Eye, MessageSquare, ArrowRight, ShieldCheck, Search, PlusCircle } from "lucide-react";
 
@@ -111,9 +112,13 @@ export default function Dashboard() {
 
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-white text-2xl font-bold">
-                  {user?.firstName?.[0]}{user?.lastName?.[0]}
-                </div>
+                <ProfileAvatar 
+                  photoUrl={user?.photoUrl} 
+                  firstName={user?.firstName} 
+                  lastName={user?.lastName} 
+                  size="xl" 
+                  className="rounded-2xl"
+                />
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-xl font-bold">

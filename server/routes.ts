@@ -144,7 +144,18 @@ export async function registerRoutes(
       (q as string) || "", 
       location as string | undefined
     );
-    res.json(profiles);
+    
+    // Add owner photo URL to each profile
+    const profilesWithPhotos = await Promise.all(profiles.map(async (profile) => {
+      let ownerPhotoUrl = null;
+      if (profile.ownerUserId) {
+        const owner = await storage.getUser(profile.ownerUserId);
+        ownerPhotoUrl = owner?.photoUrl;
+      }
+      return { ...profile, ownerPhotoUrl };
+    }));
+    
+    res.json(profilesWithPhotos);
   });
 
   app.get("/api/profiles/:id", async (req, res) => {
@@ -165,6 +176,13 @@ export async function registerRoutes(
 
     const stats = await storage.getProfileRatingStats(profile.id);
     
+    // Get owner's photo URL
+    let ownerPhotoUrl = null;
+    if (profile.ownerUserId) {
+      const owner = await storage.getUser(profile.ownerUserId);
+      ownerPhotoUrl = owner?.photoUrl;
+    }
+    
     // Respect reviews visibility
     let reviews: any[] = [];
     if (profile.reviewsVisibility === "public" || isOwner) {
@@ -178,13 +196,14 @@ export async function registerRoutes(
           reviewer: reviewer ? { 
             firstName: reviewer.firstName, 
             lastName: reviewer.lastName,
-            phoneVerified: reviewer.phoneVerified 
+            phoneVerified: reviewer.phoneVerified,
+            photoUrl: reviewer.photoUrl
           } : null,
         };
       }));
     }
 
-    res.json({ profile, stats, reviews });
+    res.json({ profile, stats, reviews, ownerPhotoUrl });
   });
 
   app.get("/api/profiles/my/profile", requireAuth, async (req, res) => {

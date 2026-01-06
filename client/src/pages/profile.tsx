@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { AppLayout } from "@/components/app-layout";
+import { ProfileAvatar } from "@/components/profile-avatar";
 import { 
   Star, 
   ShieldCheck, 
@@ -124,9 +125,13 @@ export default function ProfilePage() {
         {/* Profile Header */}
         <div className="glass rounded-2xl p-8">
           <div className="flex flex-col md:flex-row gap-6">
-            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-white text-3xl font-bold shrink-0">
-              {profile.firstName?.[0]}{profile.lastName?.[0]}
-            </div>
+            <ProfileAvatar 
+              photoUrl={data.ownerPhotoUrl} 
+              firstName={profile.firstName} 
+              lastName={profile.lastName} 
+              size="xl" 
+              className="rounded-2xl"
+            />
 
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-3 mb-2">
@@ -278,9 +283,12 @@ export default function ProfilePage() {
                 <div key={review.id} className="bg-white/5 rounded-xl p-4 border border-white/5">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-white text-sm font-medium">
-                        {review.reviewer?.firstName?.[0]}{review.reviewer?.lastName?.[0]}
-                      </div>
+                      <ProfileAvatar 
+                        photoUrl={review.reviewer?.photoUrl} 
+                        firstName={review.reviewer?.firstName} 
+                        lastName={review.reviewer?.lastName} 
+                        size="md" 
+                      />
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">

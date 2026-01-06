@@ -1,10 +1,10 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
+import { ProfileAvatar } from "./profile-avatar";
 import { 
   Home, 
   Search, 
-  User, 
   PlusCircle, 
   Settings, 
   BarChart3, 
@@ -15,7 +15,6 @@ import {
   X,
   Rss
 } from "lucide-react";
-import { useState } from "react";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -69,9 +68,12 @@ export function AppLayout({ children }: AppLayoutProps) {
 
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 text-sm">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-white font-medium">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
-              </div>
+              <ProfileAvatar 
+                photoUrl={user?.photoUrl} 
+                firstName={user?.firstName} 
+                lastName={user?.lastName} 
+                size="sm" 
+              />
               <span className="text-white/80">{user?.firstName}</span>
             </div>
             <button
