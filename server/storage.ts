@@ -6,6 +6,7 @@ import {
   nominations, 
   reports, 
   profileViews,
+  follows,
   type User, 
   type InsertUser,
   type PeopleProfile,
@@ -16,9 +17,20 @@ import {
   type InsertNomination,
   type Report,
   type InsertReport,
+  type Follow,
 } from "@shared/schema";
-import { eq, ilike, or, and, sql, desc, count } from "drizzle-orm";
+import { eq, ilike, or, and, sql, desc, count, gte, inArray } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+
+export type FeedItem = {
+  id: string;
+  type: "review" | "profile_claimed" | "user_verified" | "trending";
+  createdAt: Date;
+  profile: PeopleProfile;
+  review?: Review & { reviewer?: { firstName: string; lastName: string; phoneVerified: boolean | null } };
+  user?: { firstName: string; lastName: string };
+  trendingScore?: number;
+};
 
 export interface IStorage {
   // Users
@@ -66,6 +78,16 @@ export interface IStorage {
   // Admin
   getAllUsers(): Promise<User[]>;
   banUser(id: string): Promise<void>;
+
+  // Follows
+  followProfile(followerUserId: string, targetProfileId: string): Promise<Follow>;
+  unfollowProfile(followerUserId: string, targetProfileId: string): Promise<void>;
+  isFollowing(followerUserId: string, targetProfileId: string): Promise<boolean>;
+  getFollowedProfiles(userId: string): Promise<string[]>;
+
+  // Feed
+  getFeed(userId: string, filter: "all" | "reviews" | "new_profiles" | "trending" | "following"): Promise<FeedItem[]>;
+  getTrendingProfiles(): Promise<{ profile: PeopleProfile; score: number }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -151,7 +173,7 @@ export class DatabaseStorage implements IStorage {
 
   async claimProfile(profileId: string, userId: string): Promise<PeopleProfile | undefined> {
     const [profile] = await db.update(peopleProfiles)
-      .set({ ownerUserId: userId, claimed: true })
+      .set({ ownerUserId: userId, claimed: true, claimedAt: new Date() })
       .where(eq(peopleProfiles.id, profileId))
       .returning();
     
@@ -329,6 +351,169 @@ export class DatabaseStorage implements IStorage {
 
   async banUser(id: string): Promise<void> {
     await db.delete(users).where(eq(users.id, id));
+  }
+
+  // Follows
+  async followProfile(followerUserId: string, targetProfileId: string): Promise<Follow> {
+    const existing = await db.select().from(follows)
+      .where(and(eq(follows.followerUserId, followerUserId), eq(follows.targetProfileId, targetProfileId)));
+    
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    const [follow] = await db.insert(follows).values({ followerUserId, targetProfileId }).returning();
+    return follow;
+  }
+
+  async unfollowProfile(followerUserId: string, targetProfileId: string): Promise<void> {
+    await db.delete(follows)
+      .where(and(eq(follows.followerUserId, followerUserId), eq(follows.targetProfileId, targetProfileId)));
+  }
+
+  async isFollowing(followerUserId: string, targetProfileId: string): Promise<boolean> {
+    const [result] = await db.select().from(follows)
+      .where(and(eq(follows.followerUserId, followerUserId), eq(follows.targetProfileId, targetProfileId)));
+    return !!result;
+  }
+
+  async getFollowedProfiles(userId: string): Promise<string[]> {
+    const result = await db.select({ targetProfileId: follows.targetProfileId })
+      .from(follows)
+      .where(eq(follows.followerUserId, userId));
+    return result.map(r => r.targetProfileId);
+  }
+
+  // Feed
+  async getTrendingProfiles(): Promise<{ profile: PeopleProfile; score: number }[]> {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    
+    // Get view counts in last 7 days
+    const viewCounts = await db.select({
+      profileId: profileViews.targetProfileId,
+      count: count(),
+    })
+      .from(profileViews)
+      .where(gte(profileViews.createdAt, sevenDaysAgo))
+      .groupBy(profileViews.targetProfileId);
+
+    // Get review counts in last 7 days
+    const reviewCounts = await db.select({
+      profileId: reviews.targetProfileId,
+      count: count(),
+    })
+      .from(reviews)
+      .where(and(gte(reviews.createdAt, sevenDaysAgo), eq(reviews.status, "published")))
+      .groupBy(reviews.targetProfileId);
+
+    // Calculate scores (views + reviews * 10)
+    const scores = new Map<string, number>();
+    for (const v of viewCounts) {
+      scores.set(v.profileId, (scores.get(v.profileId) || 0) + v.count);
+    }
+    for (const r of reviewCounts) {
+      scores.set(r.profileId, (scores.get(r.profileId) || 0) + r.count * 10);
+    }
+
+    // Get top profiles
+    const sortedProfileIds = [...scores.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([id]) => id);
+
+    if (sortedProfileIds.length === 0) return [];
+
+    const profiles = await db.select().from(peopleProfiles)
+      .where(and(
+        inArray(peopleProfiles.id, sortedProfileIds),
+        eq(peopleProfiles.profileVisibility, "public")
+      ));
+
+    return profiles
+      .map(p => ({ profile: p, score: scores.get(p.id) || 0 }))
+      .sort((a, b) => b.score - a.score);
+  }
+
+  async getFeed(userId: string, filter: "all" | "reviews" | "new_profiles" | "trending" | "following"): Promise<FeedItem[]> {
+    const feedItems: FeedItem[] = [];
+    const followedIds = filter === "following" ? await this.getFollowedProfiles(userId) : [];
+
+    // Get published reviews
+    if (filter === "all" || filter === "reviews" || filter === "following") {
+      let reviewQuery = db.select().from(reviews)
+        .where(eq(reviews.status, "published"))
+        .orderBy(desc(reviews.createdAt))
+        .limit(50);
+
+      const publishedReviews = await reviewQuery;
+
+      for (const review of publishedReviews) {
+        const profile = await this.getProfile(review.targetProfileId);
+        if (!profile || profile.profileVisibility !== "public") continue;
+        if (filter === "following" && !followedIds.includes(profile.id)) continue;
+
+        const reviewer = await this.getUser(review.reviewerUserId);
+        feedItems.push({
+          id: `review-${review.id}`,
+          type: "review",
+          createdAt: review.createdAt!,
+          profile,
+          review: {
+            ...review,
+            reviewer: reviewer ? {
+              firstName: reviewer.firstName,
+              lastName: reviewer.lastName,
+              phoneVerified: reviewer.phoneVerified,
+            } : undefined,
+          },
+        });
+      }
+    }
+
+    // Get recently claimed profiles
+    if (filter === "all" || filter === "new_profiles" || filter === "following") {
+      const claimedProfiles = await db.select().from(peopleProfiles)
+        .where(and(
+          eq(peopleProfiles.claimed, true),
+          eq(peopleProfiles.profileVisibility, "public")
+        ))
+        .orderBy(desc(peopleProfiles.claimedAt))
+        .limit(20);
+
+      for (const profile of claimedProfiles) {
+        if (filter === "following" && !followedIds.includes(profile.id)) continue;
+        if (!profile.claimedAt) continue;
+
+        const owner = profile.ownerUserId ? await this.getUser(profile.ownerUserId) : undefined;
+        feedItems.push({
+          id: `claimed-${profile.id}`,
+          type: "profile_claimed",
+          createdAt: profile.claimedAt,
+          profile,
+          user: owner ? { firstName: owner.firstName, lastName: owner.lastName } : undefined,
+        });
+      }
+    }
+
+    // Get trending profiles
+    if (filter === "all" || filter === "trending") {
+      const trending = await this.getTrendingProfiles();
+      for (const { profile, score } of trending) {
+        if (filter === "following" && !followedIds.includes(profile.id)) continue;
+        feedItems.push({
+          id: `trending-${profile.id}`,
+          type: "trending",
+          createdAt: new Date(),
+          profile,
+          trendingScore: score,
+        });
+      }
+    }
+
+    // Sort by date descending and return
+    return feedItems
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, 50);
   }
 }
 

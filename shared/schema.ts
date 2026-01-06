@@ -21,7 +21,9 @@ export const users = pgTable("users", {
   location: text("location"),
   phoneNumber: text("phone_number"),
   phoneVerified: boolean("phone_verified").default(false),
+  phoneVerifiedAt: timestamp("phone_verified_at"),
   kycStatus: kycStatusEnum("kyc_status").default("none"),
+  kycVerifiedAt: timestamp("kyc_verified_at"),
   role: roleEnum("role").default("user"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -35,6 +37,7 @@ export const peopleProfiles = pgTable("people_profiles", {
   contactEmail: text("contact_email"),
   contactPhone: text("contact_phone"),
   claimed: boolean("claimed").default(false),
+  claimedAt: timestamp("claimed_at"),
   profileVisibility: visibilityEnum("profile_visibility").default("public"),
   reviewsVisibility: visibilityEnum("reviews_visibility").default("public"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -79,6 +82,13 @@ export const profileViews = pgTable("profile_views", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const follows = pgTable("follows", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  followerUserId: varchar("follower_user_id").references(() => users.id).notNull(),
+  targetProfileId: varchar("target_profile_id").references(() => peopleProfiles.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({ 
   id: true, 
   createdAt: true,
@@ -96,6 +106,7 @@ export const insertPeopleProfileSchema = createInsertSchema(peopleProfiles).omit
   id: true, 
   createdAt: true,
   claimed: true,
+  claimedAt: true,
   ownerUserId: true,
 });
 
@@ -137,3 +148,4 @@ export type InsertNomination = z.infer<typeof insertNominationSchema>;
 export type Report = typeof reports.$inferSelect;
 export type InsertReport = z.infer<typeof insertReportSchema>;
 export type ProfileView = typeof profileViews.$inferSelect;
+export type Follow = typeof follows.$inferSelect;
